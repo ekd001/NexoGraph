@@ -43,45 +43,9 @@
   </div>
 
   <!-- ═══════ MODAL SCAN ═══════ -->
-  <div class="modal-overlay" id="modal-scan">
-    <div class="modal scan-modal">
-      <div class="modal-header">
-        <div style="display:flex;align-items:center;gap:10px">
-          <div class="scan-modal-icon"><i data-lucide="folder-search" style="width:18px;height:18px"></i></div>
-          <h2 data-i18n="modal.scan.title"></h2>
-        </div>
-        <button class="btn-ghost" id="modal-close"><i data-lucide="x" style="width:16px;height:16px"></i></button>
-      </div>
-      <div class="modal-body" style="gap:var(--sp-4)">
-        <!-- Step 1: Project name -->
-        <div class="scan-step">
-          <div class="scan-step-num">1</div>
-          <div class="scan-step-content">
-            <label data-i18n="modal.scan.name"></label>
-            <input type="text" id="input-name" class="input" data-i18n-ph="modal.scan.namePh">
-          </div>
-        </div>
-        <!-- Step 2: Browse folder -->
-        <div class="scan-step">
-          <div class="scan-step-num">2</div>
-          <div class="scan-step-content" style="flex:1;min-width:0">
-            <label data-i18n="modal.scan.path"></label>
-            <div class="browser-path" id="browser-path"></div>
-            <div class="browser-list" id="browser-list"></div>
-            <input type="hidden" id="input-path">
-          </div>
-        </div>
-      </div>
-      <div class="modal-error" id="scan-error" style="display:none"></div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" id="modal-cancel" data-i18n="btn.cancel"></button>
-        <button class="btn btn-primary" id="btn-scan">
-          <span class="scan-btn-label"><i data-lucide="play" style="width:14px;height:14px"></i> <span data-i18n="btn.scan"></span></span>
-          <span class="scan-btn-loading" style="display:none"><svg class="spinner" width="14" height="14" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2.5" fill="none" stroke-dasharray="28" stroke-dashoffset="8" stroke-linecap="round"/></svg> <span data-i18n="btn.scanning"></span></span>
-        </button>
-      </div>
-    </div>
-  </div>
+  <!-- Modal scan is no longer needed — scanning happens via showDirectoryPicker -->
+  <!-- Kept as hidden placeholder for compatibility -->
+  <div class="modal-overlay" id="modal-scan"></div>
 
   <!-- ═══════ EXPLORER ═══════ -->
   <div id="view-explorer" class="view">
@@ -208,6 +172,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="scanner-client.js"></script>
   <script src="i18n.js"></script>
   <script src="engine/layout.js"></script>
   <script src="engine/renderer.js"></script>

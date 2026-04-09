@@ -1,13 +1,13 @@
 /**
- * app.js — Main orchestrator v2
+ * app.js — Main orchestrator v3
  *
- * State persistence: saves current project in localStorage.
- * On refresh, reopens the last viewed project automatically.
+ * All data is client-side (localStorage). No server API dependency.
+ * Projects are scanned via File System Access API, stored in localStorage.
  */
 
 const App = (() => {
 
-  let currentProject = null;
+  let currentProjectId = null;
   let currentData = null;
 
   function init() {
@@ -33,67 +33,61 @@ const App = (() => {
       }
     });
 
-    // Restore last opened project on refresh
-    const lastProject = Projects.getLastProject();
-    if (lastProject) {
-      openProject(lastProject);
-    }
+    // Restore last project on refresh
+    const lastId = Projects.getLastProject();
+    if (lastId) openProject(lastId);
   }
 
-  async function openProject(filename) {
-    try {
-      const res = await fetch(`/api/projects/${filename}`);
-      if (!res.ok) throw new Error('Project not found');
-
-      currentData = await res.json();
-      currentProject = filename;
-
-      // Save for persistence across refreshes
-      Projects.saveLastProject(filename);
-
-      Detail.setData(currentData);
-      Toolbar.setData(currentData);
-      ExportManager.setData(currentData);
-
-      switchView('view-explorer');
-      Renderer.render(currentData);
-
-    } catch (err) {
-      // Project not found (deleted?), clear saved state and stay home
+  function openProject(projectId) {
+    const data = Projects.getProjectById(projectId);
+    if (!data) {
       Projects.clearLastProject();
-      Toast.show(I18N.t('toast.error') + ': ' + err.message, 'error');
+      Toast.show(I18N.t('toast.error') + ': Project not found', 'error');
+      return;
     }
+
+    currentData = data;
+    currentProjectId = projectId;
+    Projects.saveLastProject(projectId);
+
+    Detail.setData(currentData);
+    Toolbar.setData(currentData);
+    ExportManager.setData(currentData);
+
+    switchView('view-explorer');
+    Renderer.render(currentData);
   }
 
   function goHome() {
-    currentProject = null;
+    currentProjectId = null;
     currentData = null;
     Projects.clearLastProject();
     switchView('view-projects');
     Detail.hide();
     Renderer.deselect();
     document.getElementById('search-input').value = '';
-    Projects.loadProjects();
+    Projects.refresh();
   }
 
   async function rescan() {
     if (!currentData) return;
+    // Re-scan = open folder picker again + replace project
     try {
       Toast.show(I18N.t('btn.scanning'), 'info');
-      const res = await fetch('/api/scan', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          projectPath: currentData.project.path,
-          projectName: currentData.project.name,
-        }),
-      });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.error);
+      const result = await ClientScanner.scanDirectory();
+      if (!result) return;
 
-      Toast.show(`${result.stats.totalCollections} ${I18N.t('toast.scanOk')} ${result.stats.scanTimeMs}ms`, 'success');
-      // Reload in place, don't go home
-      openProject(currentProject);
+      // Use existing project name if user picked same folder
+      const projects = JSON.parse(localStorage.getItem('nexograph-projects') || '[]');
+      const existing = projects.find(p => p.id === currentProjectId);
+      if (existing) {
+        existing.data = result;
+        localStorage.setItem('nexograph-projects', JSON.stringify(projects));
+      }
+
+      const s = result.project.stats;
+      Toast.show(`${s.totalCollections} ${I18N.t('toast.scanOk')} ${s.scanTimeMs}ms`, 'success');
+      openProject(currentProjectId);
     } catch (err) {
       Toast.show(I18N.t('toast.error') + ': ' + err.message, 'error');
     }
@@ -113,6 +107,5 @@ const App = (() => {
 
 document.addEventListener('DOMContentLoaded', () => {
   App.init();
-  // Re-render Lucide icons after dynamic content is loaded
   if (typeof lucide !== 'undefined') lucide.createIcons();
 });
