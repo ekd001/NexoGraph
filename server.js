@@ -58,6 +58,9 @@ function validateFilename(req, res, next) {
  * Securite : empeche l'acces aux fichiers, ne liste que les dossiers.
  */
 app.get('/api/browse', (req, res) => {
+  if (process.env.VERCEL) {
+    return res.status(400).json({ error: 'File browsing is only available in local mode. Use "npm start" locally.' });
+  }
   const targetPath = req.query.path || require('os').homedir();
   const absPath = path.resolve(targetPath);
 
@@ -173,6 +176,9 @@ app.get('/api/projects/:filename', validateFilename, (req, res) => {
  * et retourne les stats du scan.
  */
 app.post('/api/scan', async (req, res) => {
+  if (process.env.VERCEL) {
+    return res.status(400).json({ error: 'Scanning is only available in local mode. Use "npm start" locally.' });
+  }
   const { projectPath, projectName } = req.body;
 
   if (!projectPath || !projectName) {
@@ -265,25 +271,33 @@ app.get('*', (req, res) => {
 // DEMARRAGE
 // ─────────────────────────────────────────────────────────
 
-app.listen(PORT, async () => {
-  const url = `http://localhost:${PORT}`;
+// ─────────────────────────────────────────────────────────
+// EXPORT + DEMARRAGE
+// ─────────────────────────────────────────────────────────
 
-  console.log('');
-  console.log('  ┌──────────────────────────────────────┐');
-  console.log('  │                                      │');
-  console.log('  │         N E X O G R A P H            │');
-  console.log('  │      Collections Visualizer          │');
-  console.log('  │                                      │');
-  console.log(`  │   ${url}              │`);
-  console.log('  │                                      │');
-  console.log('  └──────────────────────────────────────┘');
-  console.log('');
+// Export for Vercel serverless
+module.exports = app;
 
-  // Ouvrir le navigateur automatiquement
-  try {
-    const open = (await import('open')).default;
-    open(url);
-  } catch {
-    console.log(`  Ouvrez ${url} dans votre navigateur.`);
-  }
-});
+// Only start the listener in local mode (not on Vercel)
+if (!process.env.VERCEL) {
+  app.listen(PORT, async () => {
+    const url = `http://localhost:${PORT}`;
+    console.log('');
+    console.log('  ┌──────────────────────────────────────┐');
+    console.log('  │                                      │');
+    console.log('  │         N E X O G R A P H            │');
+    console.log('  │      Collections Visualizer          │');
+    console.log('  │                                      │');
+    console.log(`  │   ${url}              │`);
+    console.log('  │                                      │');
+    console.log('  └──────────────────────────────────────┘');
+    console.log('');
+
+    try {
+      const open = (await import('open')).default;
+      open(url);
+    } catch {
+      console.log(`  Ouvrez ${url} dans votre navigateur.`);
+    }
+  });
+}
