@@ -170,6 +170,30 @@ git push origin v1.0.0
 
 The release workflow creates a GitHub Release with `.tar.gz` and `.zip` artifacts.
 
+## Deployment
+
+Nexograph can be deployed on **Vercel** as a demo/showcase. The scan and file browser only work locally — the deployed version supports **import** of `.nexo`/JSON files.
+
+### Setup Vercel
+
+1. Create a project on [vercel.com](https://vercel.com) linked to the repo
+2. Add these secrets in GitHub repo settings (`Settings > Secrets > Actions`):
+   - `VERCEL_TOKEN` — from [vercel.com/account/tokens](https://vercel.com/account/tokens)
+   - `VERCEL_ORG_ID` — from `.vercel/project.json` after `npx vercel link`
+   - `VERCEL_PROJECT_ID` — from `.vercel/project.json` after `npx vercel link`
+3. Every merge to `main` triggers auto-deploy
+
+### Local vs Hosted
+
+| Feature | Local (`npm start`) | Vercel |
+|---------|-------------------|--------|
+| Scan projects | Yes | No |
+| File browser | Yes | No |
+| Import .nexo/JSON | Yes | Yes |
+| All 3 views | Yes | Yes |
+| Export PDF/PNG/SVG | Yes | Yes |
+| Theme/Language | Yes | Yes |
+
 ## License
 
 MIT
