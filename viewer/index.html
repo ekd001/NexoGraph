@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexograph</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="themes/dark.css">
+  <link rel="stylesheet" href="themes/light.css">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+
+  <!-- ═══════ HOME ═══════ -->
+  <div id="view-projects" class="view active">
+    <div class="projects-header">
+      <div class="logo">
+        <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
+          <defs><linearGradient id="lg" x1="0" y1="0" x2="32" y2="32"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#6366f1"/></linearGradient></defs>
+          <rect width="32" height="32" rx="8" fill="url(#lg)"/>
+          <path d="M8 16L14 10L20 16L14 22Z" fill="#fff" opacity=".95"/>
+          <path d="M14 16L20 10L26 16L20 22Z" fill="#fff" opacity=".55"/>
+        </svg>
+        <h1>Nexograph</h1>
+      </div>
+      <p class="subtitle" data-i18n="app.subtitle"></p>
+    </div>
+
+    <div class="projects-actions">
+      <button class="btn btn-primary" id="btn-new-project">
+        <i data-lucide="plus" style="width:15px;height:15px"></i>
+        <span data-i18n="btn.newProject"></span>
+      </button>
+      <button class="btn btn-secondary" id="btn-import-project">
+        <i data-lucide="download" style="width:15px;height:15px"></i>
+        <span data-i18n="btn.import"></span>
+      </button>
+    </div>
+
+    <div class="projects-grid" id="projects-grid"></div>
+  </div>
+
+  <!-- ═══════ MODAL SCAN ═══════ -->
+  <div class="modal-overlay" id="modal-scan">
+    <div class="modal scan-modal">
+      <div class="modal-header">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="scan-modal-icon"><i data-lucide="folder-search" style="width:18px;height:18px"></i></div>
+          <h2 data-i18n="modal.scan.title"></h2>
+        </div>
+        <button class="btn-ghost" id="modal-close"><i data-lucide="x" style="width:16px;height:16px"></i></button>
+      </div>
+      <div class="modal-body" style="gap:var(--sp-4)">
+        <!-- Step 1: Project name -->
+        <div class="scan-step">
+          <div class="scan-step-num">1</div>
+          <div class="scan-step-content">
+            <label data-i18n="modal.scan.name"></label>
+            <input type="text" id="input-name" class="input" data-i18n-ph="modal.scan.namePh">
+          </div>
+        </div>
+        <!-- Step 2: Browse folder -->
+        <div class="scan-step">
+          <div class="scan-step-num">2</div>
+          <div class="scan-step-content" style="flex:1;min-width:0">
+            <label data-i18n="modal.scan.path"></label>
+            <div class="browser-path" id="browser-path"></div>
+            <div class="browser-list" id="browser-list"></div>
+            <input type="hidden" id="input-path">
+          </div>
+        </div>
+      </div>
+      <div class="modal-error" id="scan-error" style="display:none"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="modal-cancel" data-i18n="btn.cancel"></button>
+        <button class="btn btn-primary" id="btn-scan">
+          <span class="scan-btn-label"><i data-lucide="play" style="width:14px;height:14px"></i> <span data-i18n="btn.scan"></span></span>
+          <span class="scan-btn-loading" style="display:none"><svg class="spinner" width="14" height="14" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2.5" fill="none" stroke-dasharray="28" stroke-dashoffset="8" stroke-linecap="round"/></svg> <span data-i18n="btn.scanning"></span></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ EXPLORER ═══════ -->
+  <div id="view-explorer" class="view">
+    <div class="toolbar">
+      <button class="toolbar-btn" id="btn-back" data-i18n-title="btn.back">
+        <i data-lucide="arrow-left"></i>
+      </button>
+
+      <div class="toolbar-sep"></div>
+
+      <div class="breadcrumb">
+        <span class="crumb crumb-project" id="crumb-project"></span>
+      </div>
+
+      <div class="toolbar-search">
+        <i data-lucide="search" style="width:14px;height:14px;flex-shrink:0;opacity:.5"></i>
+        <input type="text" id="search-input" class="toolbar-search-input" data-i18n-ph="search.placeholder">
+      </div>
+
+      <div class="toolbar-right">
+        <div class="toolbar-group" id="view-mode-btns">
+          <button class="toolbar-btn active" data-view="domains" data-i18n-title="view.domains">
+            <i data-lucide="layout-grid"></i>
+          </button>
+          <button class="toolbar-btn" data-view="graph" data-i18n-title="view.graph">
+            <i data-lucide="git-branch"></i>
+          </button>
+          <button class="toolbar-btn" data-view="list" data-i18n-title="view.list">
+            <i data-lucide="list"></i>
+          </button>
+        </div>
+
+        <div class="toolbar-sep"></div>
+
+        <button class="toolbar-btn" id="btn-export" data-i18n-title="btn.export">
+          <i data-lucide="share"></i>
+        </button>
+        <button class="toolbar-btn" id="btn-rescan" data-i18n-title="btn.rescan">
+          <i data-lucide="refresh-cw"></i>
+        </button>
+
+        <div class="toolbar-sep"></div>
+
+        <button class="toolbar-btn" id="btn-theme" data-i18n-title="btn.theme">
+          <i data-lucide="sun-moon" id="icon-theme"></i>
+        </button>
+        <button class="toolbar-btn" id="btn-lang" style="font-size:11px;font-weight:700;width:auto;padding:0 10px" data-i18n="btn.lang"></button>
+        <button class="toolbar-btn" id="btn-guide" title="Guide">
+          <i data-lucide="circle-help"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="explorer-body">
+      <div class="domain-sidebar" id="domain-sidebar">
+        <div class="sidebar-header">
+          <h3 data-i18n="sidebar.domains"></h3>
+          <span class="badge" id="domain-count">0</span>
+        </div>
+        <div class="domain-list" id="domain-list"></div>
+
+        <div class="sidebar-header" style="margin-top:14px">
+          <h3 data-i18n="sidebar.stats"></h3>
+        </div>
+        <div class="stats-grid" id="stats-grid"></div>
+      </div>
+
+      <div class="canvas-container" id="canvas-container"></div>
+
+      <div class="detail-panel" id="detail-panel">
+        <div class="detail-empty" id="detail-empty">
+          <i data-lucide="mouse-pointer-click" style="width:40px;height:40px;opacity:.15"></i>
+          <p data-i18n="detail.empty"></p>
+        </div>
+        <div id="detail-content" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ DROPDOWN EXPORT ═══════ -->
+  <div class="dropdown-menu" id="export-menu" style="display:none">
+    <button class="dropdown-item" data-export="pdf"><i data-lucide="file-text" style="width:14px;height:14px;margin-right:8px;vertical-align:-2px"></i><span data-i18n="export.pdf"></span></button>
+    <button class="dropdown-item" data-export="png"><i data-lucide="image" style="width:14px;height:14px;margin-right:8px;vertical-align:-2px"></i><span data-i18n="export.png"></span></button>
+    <button class="dropdown-item" data-export="svg"><i data-lucide="pen-tool" style="width:14px;height:14px;margin-right:8px;vertical-align:-2px"></i><span data-i18n="export.svg"></span></button>
+    <button class="dropdown-item" data-export="nexo"><i data-lucide="package" style="width:14px;height:14px;margin-right:8px;vertical-align:-2px"></i><span data-i18n="export.nexo"></span></button>
+    <button class="dropdown-item" data-export="json"><i data-lucide="braces" style="width:14px;height:14px;margin-right:8px;vertical-align:-2px"></i><span data-i18n="export.json"></span></button>
+  </div>
+
+  <!-- ═══════ MODAL CONFIRM ═══════ -->
+  <div class="modal-overlay" id="modal-confirm">
+    <div class="modal" style="max-width:400px">
+      <div class="modal-header">
+        <h2 id="confirm-title"></h2>
+      </div>
+      <div class="modal-body">
+        <p id="confirm-message" style="color:var(--text-secondary);font-size:14px;line-height:1.5"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="confirm-cancel" data-i18n="btn.cancel"></button>
+        <button class="btn btn-danger" id="confirm-ok"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ MODAL GUIDE ═══════ -->
+  <div class="modal-overlay" id="modal-guide">
+    <div class="modal" style="max-width:640px">
+      <div class="modal-header">
+        <h2 id="guide-title"></h2>
+        <button class="btn-ghost" id="guide-close"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+      </div>
+      <div class="modal-body" id="guide-body" style="max-height:60vh;overflow-y:auto"></div>
+    </div>
+  </div>
+
+  <!-- ═══════ TOASTS ═══════ -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- ═══════ IMPORT ═══════ -->
+  <input type="file" id="file-import" accept=".json,.nexo" style="display:none">
+
+  <!-- ═══════ SCRIPTS ═══════ -->
+  <script src="https://cdn.jsdelivr.net/npm/@dagrejs/dagre@1.1.4/dist/dagre.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="i18n.js"></script>
+  <script src="engine/layout.js"></script>
+  <script src="engine/renderer.js"></script>
+  <script src="components/projects.js"></script>
+  <script src="components/detail.js"></script>
+  <script src="components/toolbar.js"></script>
+  <script src="components/export.js"></script>
+  <script src="app.js"></script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

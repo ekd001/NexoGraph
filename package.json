@@ -1,0 +1,13 @@
+{
+  "name": "nexograph",
+  "version": "1.0.0",
+  "description": "Visualisateur interactif de collections et relations pour backends Node.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "open": "^9.1.0",
+    "glob": "^10.3.10"
+  }
+}

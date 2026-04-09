@@ -1,0 +1,35 @@
+/**
+ * dark.css — Deep Navy / Blue theme
+ * Inspired by Linear, Vercel dark mode
+ */
+[data-theme="dark"] {
+  --bg:               #0a0e1a;
+  --surface:          #111627;
+  --surface-alt:      #161b2e;
+  --surface-hover:    #1c2240;
+  --input-bg:         #0d1220;
+
+  --border:           #1e2540;
+  --border-hover:     #2a3358;
+  --border-subtle:    rgba(255,255,255,0.04);
+
+  --text:             #e8ecf4;
+  --text-secondary:   #8b92a8;
+  --text-muted:       #555e78;
+
+  --accent:           #3b82f6;
+  --accent-hover:     #2563eb;
+  --accent-soft:      rgba(59,130,246,0.12);
+  --accent-secondary: #6e9fff;
+
+  --success:          #22c55e;
+  --success-soft:     rgba(34,197,94,0.12);
+  --danger:           #ef4444;
+  --danger-soft:      rgba(239,68,68,0.12);
+  --warning:          #eab308;
+  --warning-soft:     rgba(234,179,8,0.12);
+
+  --shadow-sm:  0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md:  0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg:  0 8px 24px rgba(0,0,0,0.5);
+}
